@@ -7,6 +7,8 @@ public class Astroid : MonoBehaviour
     public float Speed = 5;
     Rigidbody2D rb;
     bool dangerous = true;
+    public GameObject bum;
+    public GameObject luftSten, LandSten;
 
     
     // Start is called before the first frame update
@@ -22,11 +24,17 @@ public class Astroid : MonoBehaviour
         if(collision.transform.tag  == "Player")
         {
             UIhandler.collectedStones++;
-            Destroy(gameObject);
+            
             if (dangerous)
                 Player.life--;
+            Player.instance.PlayAv();
+            Destroy(gameObject);
         }
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
         dangerous = false;
+        
+        bum.SetActive(true);
+        luftSten.SetActive(false);
+        LandSten.SetActive(true);
     }
 }

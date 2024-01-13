@@ -5,7 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    public static Player instance;
     public static int life =3;
+
+    public AudioSource boostPlayer;
+
+    public AudioSource jumpPlayer;
+    public AudioSource avPlayer;
+    public AudioSource breakPlayer;
+
+    public Animator anim;
+    public SpriteRenderer rend;
 
     Rigidbody2D rb;
     public float MaxSpeed = 5;
@@ -27,13 +37,25 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
         rb = GetComponent<Rigidbody2D>();
     }
-
+    public void PlayAv()
+    {
+        avPlayer.Play();
+    }
     // Update is called once per frame
     void Update()
     {
-        if(life <= 0)
+        anim.SetBool("Grounded", grounded);
+        Debug.Log(Mathf.Abs(rb.velocity.x) > 0.1f);
+        anim.SetBool("Walking", Mathf.Abs(rb.velocity.x) > 0.3f);
+        if (rb.velocity.x < 0) 
+            rend.flipX = true;
+        else
+            rend.flipX = false;
+
+        if (life <= 0)
         {
             GoToDeathScreen();
         }
@@ -61,7 +83,7 @@ public class Player : MonoBehaviour
         }
 
         retning *= Speed;
-        if(onBooster && Input.GetKeyDown(KeyCode.Space))
+        if(onBooster && (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)))
         {
             rb.velocity = Vector2.zero;
             Vector2 JumpDir = booster.up;
@@ -69,10 +91,12 @@ public class Player : MonoBehaviour
             HasShotFromBooster = true;
             rb.AddForce(JumpDir *jumpForce *booster.GetComponent<BoosterMultiplier>().Multiplier);
             boostActivated = true;
+            boostPlayer.Play();
             StartCoroutine(SpeedBoost(0.5f, true));
         }
-        else if (Input.GetKeyDown(KeyCode.Space) && (grounded || onWall))
+        else if ((Input.GetKeyDown(KeyCode.Space)|| Input.GetKeyDown(KeyCode.W)) && (grounded || onWall))
         {
+            jumpPlayer.Play();
             Vector2 JumpDir = Vector2.zero;
             JumpDir.y = 1;
 
@@ -153,7 +177,7 @@ public class Player : MonoBehaviour
         
         if(collision.gameObject.tag == "Destructable" && HasShotFromBooster)
         {
-
+            breakPlayer.Play();
             Destroy(collision.gameObject);
         }
         
