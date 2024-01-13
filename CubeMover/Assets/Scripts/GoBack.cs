@@ -16,7 +16,7 @@ public class GoBack : MonoBehaviour
     {
         if (Input.anyKeyDown)
         {
-            SceneManager.LoadScene("Level 1");
+            SceneManager.LoadScene("Level 2");
         }
     }
 }
